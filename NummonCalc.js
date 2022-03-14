@@ -142,9 +142,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
             "getDarkFutureYears": "距离黑暗未来的惩罚(年)",
             "getBestRelicBuilding": "获取最佳遗物建筑",
             "getBestUnobtainiumBuilding": "难得素最佳太空建筑",
-            "getAIlv15Time": "天网觉醒倒计时",
+            "getAIlv15Time": "天网觉醒倒计时(现实)",
             "getFutureSeason": "距离下次时间悖论(季节)",
-            "getadjustDay": "黑币最高价格期望倒计时",
+            "getadjustDay": "黑币最高价格期望倒计时(现实)",
 
             "best.none": "无",
             "infinity": "∞",
