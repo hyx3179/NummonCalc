@@ -747,7 +747,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
         } else if (number == 100) {
             return this.i18n("best.none");
         } else if (timeC <= 0) {
-            return "未收支平衡";
+            return "烧水晶收入未大于燃烧水晶支出";
         } else {
             var TCBack = Math.ceil(cost * number / result);
             var op = game.time.getCFU("blastFurnace").on;
@@ -1061,7 +1061,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
         },
         {
             name: "getResourceRetrievalTCBackYears",
-            // title: "Blazars for Shatter Engine",
+            title: "资源回复的回本时间，仅供参考",
             val: 0,
         },
         ],
