@@ -664,7 +664,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
         }];
         let leader = this.game.village.getEffectLeader(this.game.village.leader.trait.name, prices);
         if (prices[0].val != 100) {
-            return "* " + game.getDisplayValueExt(prices[0].val) + "%";
+            return "× " + game.getDisplayValueExt(prices[0].val) + "%";
         } else if (prices[1].val != 100) {
             return "* " + game.getDisplayValueExt(prices[1].val) + "%";
         } else {
