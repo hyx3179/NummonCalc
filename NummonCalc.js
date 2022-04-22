@@ -1302,7 +1302,7 @@ var NummonInit = function() {
 	var tabExists = false;
 	for (var i in gamePage.tabs) {
 		if (gamePage.tabs[i].tabId == "Nummon") {
-			gamePage.tabs[i] == gamePage.nummonTab;
+			gamePage.tabs[i] = gamePage.nummonTab;
 			tabExists = true;
 		}
 	}
