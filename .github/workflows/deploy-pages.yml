@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Pages
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
 
       - name: Build
         run: |
-          wget https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v20220405/closure-compiler-v20220405.jar -O ./compiler.jar
+          wget -q https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v20220405/closure-compiler-v20220405.jar -O ./compiler.jar
           mkdir ./public
           java -jar compiler.jar --js NummonCalc.js --js_output_file ./public/NummonCalc.js
           cp -r ./public ./public_Netlify
