@@ -110,7 +110,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			"getReligionProductionBonusCap": "太阳革命极限加成",
 			"getNextTranscendTierProgress": "当前顿悟值",
 			"getAdore": "赞美群星后的顿悟值",
-			 "getAdoreSloar": "赞美群星再赞美太阳的太阳革命加成",
+			"getAdoreSloar": "赞美群星再赞美太阳的太阳革命加成",
 
 			"Transcend": "次元超越",
 
@@ -154,8 +154,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	i18n: function(key, args) {
-		if (key[0] == "$")
+		if (key[0] == "$") {
 			return this.i18ng(key.slice(1));
+		}
 		var value = this.i18nData[this.lang][key];
 		if (!value) {
 			value = this.i18nData["en"][key];
@@ -165,9 +166,11 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			}
 			console.error("key \"" + key + "\" not found in " + this.lang);
 		}
-		if (args)
-			for (var i = 0; i < args.length; i++)
+		if (args) {
+			for (var i = 0; i < args.length; i++) {
 				value = value.replace("{" + i + "}", args[i]);
+			}
+		}
 		return value;
 	},
 
@@ -181,8 +184,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 	getButton: function(tab, buttonName) {
 		for (var i in this.game.tabs[tab].children) {
-			if (this.game.tabs[tab].children[i].opts.building == buttonName)
+			if (this.game.tabs[tab].children[i].opts.building == buttonName) {
 				return parseInt(i);
+			}
 		}
 	},
 
@@ -212,12 +216,15 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			num = num.toFixed(numDigits);
 			num = num.toString();
 			var decimal = num.substr(num.indexOf("."));
-			if (decimal == "." + Array(numDigits + 1).join("0"))
+			if (decimal == "." + Array(numDigits + 1).join("0")) {
 				num = num.substr(0, num.indexOf("."));
-			for (var i = (num.indexOf(".") != -1 ? num.indexOf(".") - 3 : num.length - 3); i > 0; i -= 3)
+			}
+			for (var i = (num.indexOf(".") != -1 ? num.indexOf(".") - 3 : num.length - 3); i > 0; i -= 3) {
 				num = num.substr(0, i) + "," + num.substr(i);
-		} else
+			}
+		} else {
 			num = num.toString();
+		}
 		return num;
 	},
 
@@ -294,29 +301,33 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 	getCelestialPerDay: function() {
 		var chanceRatio = 1;
-		if (this.game.prestige.getPerk("chronomancy").researched)
+		if (this.game.prestige.getPerk("chronomancy").researched) {
 			chanceRatio *= 1.1;
+		}
 		chanceRatio *= 1 + this.game.getEffect("timeRatio") * 0.25;
 
 		var chance = 25;
 		chance += this.game.getEffect("starEventChance") * 10000;
 		chance *= chanceRatio * 0.01;
-		if (this.game.prestige.getPerk("astromancy").researched)
+		if (this.game.prestige.getPerk("astromancy").researched) {
 			chance *= 2;
+		}
 
 		return game.getDisplayValueExt(chance) + "%";
 	},
 
 	getCelestialAutoSuccess: function() {
 		var autoChance = this.game.getEffect("starAutoSuccessChance") * 100;
-		if (this.game.prestige.getPerk("astromancy").researched)
+		if (this.game.prestige.getPerk("astromancy").researched) {
 			autoChance *= 2;
+		}
 		if (game.ironWill) {
 			autoChance = Math.max(26, autoChance);
 		}
 		autoChance = Math.round(autoChance);
-		if (autoChance > 100 || this.game.workshop.get("seti").researched)
+		if (autoChance > 100 || this.game.workshop.get("seti").researched) {
 			autoChance = 100;
+		}
 		return autoChance + "%";
 	},
 
@@ -367,8 +378,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var titToFill = this.game.resPool.get("titanium").maxValue;
 		titToFill -= this.game.resPool.get("titanium").value;
 		titToFill = Math.ceil(titToFill / titaniumPerTrade);
-		if (titToFill < 0)
+		if (titToFill < 0) {
 			titToFill = 0;
+		}
 		return titToFill;
 	},
 
@@ -418,8 +430,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	getBestUniBuilding: function(log = false) {
 		var unicornPastureKey = "$buildings.unicornPasture.label";
 		var pastureButton = this.getButton(0, "unicornPasture");
-		if (typeof pastureButton === "undefined")
+		if (typeof pastureButton === "undefined") {
 			return this.i18n("best.none");
+		}
 		var validBuildings = ["unicornTomb", "ivoryTower", "ivoryCitadel", "skyPalace", "unicornUtopia", "sunspire"];
 		var unicornsPerSecond = this.game.getEffect("unicornsPerTickBase") * this.game.getTicksPerSecondUI();
 		var globalRatio = this.game.getEffect("unicornsGlobalRatio") + 1;
@@ -427,15 +440,18 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var paragonRatio = this.game.prestige.getParagonProductionRatio() + 1;
 		var faithBonus = this.game.religion.getSolarRevolutionRatio() + 1;
 		var cycle = 1;
-		if (this.game.calendar.cycles[this.game.calendar.cycle].festivalEffects["unicorns"] != undefined)
-			if (this.game.prestige.getPerk("numeromancy").researched && this.game.calendar.festivalDays)
+		if (this.game.calendar.cycles[this.game.calendar.cycle].festivalEffects["unicorns"] != undefined) {
+			if (this.game.prestige.getPerk("numeromancy").researched && this.game.calendar.festivalDays) {
 				cycle = this.game.calendar.cycles[this.game.calendar.cycle].festivalEffects["unicorns"];
+			}
+		}
 		var onZig = Math.max(this.game.bld.getBuildingExt("ziggurat").meta.on, 1);
 		var total = unicornsPerSecond * globalRatio * (this.game.getEffect("unicornsRatioReligion") + 1) * paragonRatio * faithBonus * cycle;
 		var baseUnicornsPerRift = 500 * (1 + this.game.getEffect("unicornsRatioReligion") * 0.1);
 		var riftChanceRatio = 1;
-		if (this.game.prestige.getPerk("unicornmancy").researched)
+		if (this.game.prestige.getPerk("unicornmancy").researched) {
 			riftChanceRatio *= 1.1;
+		}
 		var baseRift = this.game.getEffect("riftChance") * riftChanceRatio / (10000 * 2) * baseUnicornsPerRift;
 
 		var bestAmoritization = Infinity;
@@ -455,21 +471,23 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 					var bld = this.game.religion.getZU(btn.id);
 					var unicornPrice = 0;
 					var tearsPrices = [5, 25, 50, 500, 5e3, 25e3];
-					unicornPrice += tearsPrices[i] * Math.pow(1.15 , this.game.religion.getZU(btn.id).on) * 2500 / onZig;
+					unicornPrice += tearsPrices[i] * Math.pow(1.15, this.game.religion.getZU(btn.id).on) * 2500 / onZig;
 
 
 					var relBonus = game.getEffect('unicornsRatioReligion') + 1;
 					var riftChance = this.game.getEffect("riftChance");
 					for (var j in bld.effects) {
-						if (j == "unicornsRatioReligion")
+						if (j == "unicornsRatioReligion") {
 							relBonus += bld.effects[j];
-						if (j == "riftChance")
+						}
+						if (j == "riftChance") {
 							riftChance += bld.effects[j];
+						}
 					}
 					var unicornsPerRift = 500 * ((relBonus - 1) * 0.1 + 1);
 					var riftBonus = riftChance * riftChanceRatio / (10000 * 2) * unicornsPerRift;
 					riftBonus -= baseRift;
-					
+
 					var amor = unicornsPerSecond * globalRatio * relBonus * paragonRatio * faithBonus * cycle;
 					amor -= total;
 					amor = amor + riftBonus;
@@ -486,15 +504,16 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 				}
 			}
 		}
-		if (bestBuilding != unicornPastureKey)
-			bestBuilding = "$religion.zu." + bestBuilding + ".label";
+		if (bestBuilding != unicornPastureKey) {
+			bestBuilding = "$religion.zu." + bestBuilding + ".label";}
 		return this.i18n(bestBuilding);
 	},
 
 	getBestAliBuilding: function() {
 		var bestBuilding = ["best.none", "$religion.zu.skyPalace.label", "$religion.zu.unicornUtopia.label", "$religion.zu.sunspire.label"];
-		if (!this.game.religion.getZU("skyPalace").unlocked)
+		if (!this.game.religion.getZU("skyPalace").unlocked) {
 			return this.i18n(bestBuilding[0]);
+		}
 
 		var skyPalacePrice = 1.15 ** (this.game.religion.getZU("skyPalace").val) * 125;
 		var unicornUtopiaPrice = 1.15 ** (this.game.religion.getZU("unicornUtopia").val) * 1000;
@@ -509,8 +528,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var curCorruption = this.game.religion.corruption;
 		var blsBoost = 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
 		var corruptionRate = 1;
-		if (this.game.resPool.get("necrocorn").value > 0)
+		if (this.game.resPool.get("necrocorn").value > 0) {
 			corruptionRate = 0.25 * (1 + this.game.getEffect("corruptionBoostRatio"));
+		}
 		corruptionRate *= this.game.getEffect("corruptionRatio") * blsBoost;
 		if (numAlicorns <= 0) {
 			curCorruption = 0;
@@ -519,8 +539,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		corruptionRate *= this.game.getTicksPerSecondUI();
 		var precision = this.game.opts.forceHighPrecision ? 3 : 2;
 		corruptionRate = corruptionRate.toPrecision(precision) * 1;
-		if (corruptionRate == Infinity)
+		if (corruptionRate == Infinity) {
 			return this.i18n("infinity");
+		}
 		return corruptionRate + this.i18n("sec");
 	},
 
@@ -529,15 +550,17 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var curCorruption = this.game.religion.corruption;
 		var blsBoost = 1 + Math.sqrt(this.game.resPool.get("sorrow").value * this.game.getEffect("blsCorruptionRatio"));
 		var corruptionRate = 1;
-		if (this.game.resPool.get("necrocorn").value > 0)
+		if (this.game.resPool.get("necrocorn").value > 0) {
 			corruptionRate = 0.25 * (1 + this.game.getEffect("corruptionBoostRatio"));
+		}
 		corruptionRate *= this.game.getEffect("corruptionRatio") * blsBoost;
 		if (numAlicorns <= 0) {
 			curCorruption = 0;
 			corruptionRate = 0;
 		}
-		if (corruptionRate == 0)
+		if (corruptionRate == 0) {
 			return this.i18n("infinity");
+		}
 		return this.game.toDisplaySeconds((1 - curCorruption) / (corruptionRate * this.game.getTicksPerSecondUI()));
 	},
 
@@ -590,8 +613,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	getRecNextTranscendTierProgress: function() {
-		if (this.game.religion.transcendenceTier >= 355)
+		if (this.game.religion.transcendenceTier >= 355) {
 			return "∞";
+		}
 		var tier = this.game.religion.transcendenceTier + 1;
 		var tt = this.game.religion._getTranscendTotalPrice(tier) - game.religion._getTranscendTotalPrice(tier - 1);
 		var obelisk = this.game.religion.getTU("blackObelisk").val;
@@ -600,7 +624,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var needpercent = adoreIncreaceRatio * obeliskRatio;
 		var x = tt;
 		var k = needpercent;
-		var epiphanyRecommend = x-0.0125+0.0125*(Math.pow(((Math.sqrt((80*k*x+361*k-361+80*x)/(k-1))-19*k)/(k+1)),2));
+		var epiphanyRecommend = x - 0.0125 + 0.0125 * (Math.pow(((Math.sqrt((80 * k * x + 361 * k - 361 + 80 * x) / (k - 1)) - 19 * k) / (k + 1)), 2));
 		if (game.religion.faith * 2.02 * this.game.religion.transcendenceTier + 3.03 * game.religion.faith >= 1e6 * tt && this.game.religion.faithRatio > tt) {
 			return tt;
 		} else {
@@ -672,7 +696,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		}
 	},
 
-	//TIME : 
+	//TIME
 
 	getTCPerSacrifice: function() {
 		var numTCPerSacrifice = 1;
@@ -755,7 +779,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			return this.game.toDisplaySeconds(TCBack);
 		}
 	},
-	// OTHERS : 
+	// OTHERS
 
 	/*getBestMagnetoBuilding: function() {
 		var bestBuilding = ["best.none", "$buildings.magneto.label", "$buildings.steamworks.label"];
@@ -862,12 +886,14 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var lv15Gflops = Math.exp(14.5);
 		var gflopsHave = this.game.resPool.get("gflops").value;
 		var gflopsproduction = this.game.getEffect("gflopsPerTickBase") - this.game.getEffect("gflopsConsumption");
-		if (this.game.bld.get("aiCore").effects["aiLevel"] >= 15)
+		if (this.game.bld.get("aiCore").effects["aiLevel"] >= 15) {
 			return this.i18n("done");
-		if (gflopsproduction > 0)
+		}
+		if (gflopsproduction > 0) {
 			return this.game.toDisplaySeconds((lv15Gflops - gflopsHave) / (gflopsproduction * this.game.getTicksPerSecondUI()));
-		else
+		} else {
 			return this.i18n("infinity");
+		}
 	},
 
 	getFutureSeason: function() {
@@ -901,47 +927,47 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 	stats: {
 		catnip: [{
-			name: "getCatnipInWarmSpring",
-			// title: "During Warm Spring",
-			val: 0,
-		},
-		{
-			name: "getCatnipColdWinter",
-			title: "大于 0 才不会饿死喵喵呢",
-			val: 0,
-		}
+				name: "getCatnipInWarmSpring",
+				// title: "During Warm Spring",
+				val: 0,
+			},
+			{
+				name: "getCatnipColdWinter",
+				title: "大于 0 才不会饿死喵喵呢",
+				val: 0,
+			}
 		],
 		science: [{
-			name: "getCelestialPerDay",
-			// title: "Chance of Celestial Events",
-			val: 0,
-		},
-		{
-			name: "getCelestialAutoSuccess",
-			// title: "Celestial Event Auto Success Rate",
-			val: 0,
-		},
-		{
-			name: "getMaxComped",
-			// title: "Maximum Helpful Compediums",
-			val: 0,
-		},
-		{
-			name: "getBlueprintCraft",
-			// title: "Blueprints Per Craft",
-			val: 0,
-		}
+				name: "getCelestialPerDay",
+				// title: "Chance of Celestial Events",
+				val: 0,
+			},
+			{
+				name: "getCelestialAutoSuccess",
+				// title: "Celestial Event Auto Success Rate",
+				val: 0,
+			},
+			{
+				name: "getMaxComped",
+				// title: "Maximum Helpful Compediums",
+				val: 0,
+			},
+			{
+				name: "getBlueprintCraft",
+				// title: "Blueprints Per Craft",
+				val: 0,
+			}
 		],
 		titanium: [{
-			name: "getTitPerZebraTrade",
-			// title: "Titanium Per Zebra Trade",
-			val: 0,
-		},
-		{
-			name: "getZebraTradesLeftToMaxTit",
-			// title: "Trades Left to Cap Titanium",
-			val: 0,
-		},
+				name: "getTitPerZebraTrade",
+				// title: "Titanium Per Zebra Trade",
+				val: 0,
+			},
+			{
+				name: "getZebraTradesLeftToMaxTit",
+				// title: "Trades Left to Cap Titanium",
+				val: 0,
+			},
 			//{
 			//    name: "getZebraTradesToMaxTit",
 			//    // title: "Max Zebra Trades to Cap Titanium",
@@ -949,121 +975,121 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			//},
 		],
 		pollution: [{
-			name: "getPollutionTick",
-			// title: "Production Bonus",
-			val: 0,
-		},
-		{
-			name: "getCoMax",
-			// title: "Storage Bonus",
-			val: 0,
-		},
+				name: "getPollutionTick",
+				// title: "Production Bonus",
+				val: 0,
+			},
+			{
+				name: "getCoMax",
+				// title: "Storage Bonus",
+				val: 0,
+			},
 		],
 		unicorns: [{
-			name: "getBestUniBuilding",
-			// title: "Best Unicorn Building",
-			val: 0,
-		},
-		//{
-		//    name: "getBestAliBuilding",
-		//    // title: "Best Alicorn Building Per Ivory Cost",
-		//    val: 0,
-		//},
-		{
-			name: "getNecrocornsPerSecond",
-			// title: "Necrocorns Per Second",
-			val: 0,
-		},
-		//{
-		//    name: "getNecrocornTime",
-		//    // title: "Time Until Next Necrocorn",
-		//    val: 0,
-		//},
-		{
-			name: "getLeviChance",
-			// title: "Chance per year of Leviathans",
-			val: 0,
-		},
+				name: "getBestUniBuilding",
+				// title: "Best Unicorn Building",
+				val: 0,
+			},
+			//{
+			//    name: "getBestAliBuilding",
+			//    // title: "Best Alicorn Building Per Ivory Cost",
+			//    val: 0,
+			//},
+			{
+				name: "getNecrocornsPerSecond",
+				// title: "Necrocorns Per Second",
+				val: 0,
+			},
+			//{
+			//    name: "getNecrocornTime",
+			//    // title: "Time Until Next Necrocorn",
+			//    val: 0,
+			//},
+			{
+				name: "getLeviChance",
+				// title: "Chance per year of Leviathans",
+				val: 0,
+			},
 		],
 		religion: [{
-			name: "getReligionProductionBonusCap",
-			// title: "Solar Revolution Limit",
-			val: 0,
-		},
-		{
-			name: "getNextTranscendTierProgress",
-			// title: "Apocrypha Progress",
-			val: 0,
-		},
-		{
-			name: "getAdore",
-			// title: "Solar Revolution Limit",
-			val: 0,
-		},
-		{
+				name: "getReligionProductionBonusCap",
+				// title: "Solar Revolution Limit",
+				val: 0,
+			},
+			{
+				name: "getNextTranscendTierProgress",
+				// title: "Apocrypha Progress",
+				val: 0,
+			},
+			{
+				name: "getAdore",
+				// title: "Solar Revolution Limit",
+				val: 0,
+			},
+			{
 				name: "getAdoreSloar",
 				title: "供珂学家赞美群星触发条件参考",
 				val: 0,
-		},
+			},
 		],
 		Transcend: [{
-			name: "getlowestRatio",
-			// title: "Solar Revolution Limit",
-			val: 0,
-		},
-		{
-			name: "getRecNextTranscendTierProgress",
-			title: "有这么多顿悟再次元超越是最效率的喵~",
-			val: 0,
-		},
-		{
-			name: "getBoolean",
-			// title: "Apocrypha Progress",
-			val: 0,
-		},
+				name: "getlowestRatio",
+				// title: "Solar Revolution Limit",
+				val: 0,
+			},
+			{
+				name: "getRecNextTranscendTierProgress",
+				title: "有这么多顿悟再次元超越是最效率的喵~",
+				val: 0,
+			},
+			{
+				name: "getBoolean",
+				// title: "Apocrypha Progress",
+				val: 0,
+			},
 		],
 		paragon: [{
-			name: "getParagonProductionBonus",
-			// title: "Production Bonus",
-			val: 0,
-		},
-		{
-			name: "getParagonStorageBonus",
-			// title: "Storage Bonus",
-			val: 0,
-		},
-		{
-			name: "getEffectLeader",
-			// title: "Effect Leader",
-			val: 0,
-		},
+				name: "getParagonProductionBonus",
+				// title: "Production Bonus",
+				val: 0,
+			},
+			{
+				name: "getParagonStorageBonus",
+				// title: "Storage Bonus",
+				val: 0,
+			},
+			{
+				name: "getEffectLeader",
+				// title: "Effect Leader",
+				val: 0,
+			},
 		],
 		time: [{
-			name: "getTCPerSacrifice",
-			// title: "Time Crystals per Sacrifice",
-			val: 0,
-		},
-		{
-			name: "getRelicPerTCRefine",
-			// title: "Relics Per Time Crystal Refine",
-			val: 0,
-		},
+				name: "getTCPerSacrifice",
+				// title: "Time Crystals per Sacrifice",
+				val: 0,
+			},
+			{
+				name: "getRelicPerTCRefine",
+				// title: "Relics Per Time Crystal Refine",
+				val: 0,
+			},
 		],
 		resourceRetrieval: [{
-			name: "getTradeTC",
-			// title: "Blazars for Shatter Engine",
-			val: 0,
-		},
-		{
-			name: "getTradeTCAvg",
-			// title: "Blazars for Shatter Engine",
-			val: 0,
-		},
-		{
-			name: "getResourceRetrievalTCBackYears",
-			title: "资源回复的回本时间，仅供参考",
-			val: 0,
-		},
+				name: "getTradeTC",
+				// title: "Blazars for Shatter Engine",
+				val: 0,
+			},
+			{
+				name: "getTradeTCAvg",
+				// title: "Blazars for Shatter Engine",
+				val: 0,
+			},
+			{
+				name: "getResourceRetrievalTCBackYears",
+				title: "资源回复的回本时间，仅供参考",
+				val: 0,
+			},
 		],
 		others: [
 			/*{
@@ -1109,49 +1135,49 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	statDefinitions: [{
-		name: "catnip",
-		// title: "Catnip / Sec"
-	},
-	{
-		name: "science",
-		// title: "Science"
-	},
-	{
-		name: "titanium",
-		// title: "Titanium"
-	},
-	{
-		name: "pollution",
-		// title: "Pollution"
-	},
-	{
-		name: "unicorns",
-		// title: "Unicorns""
-	},
-	{
-		name: "religion",
-		// title: "Religion"
-	},
-	{
-		name: "Transcend",
-		// title: "Transcend"
-	},
-	{
-		name: "paragon",
-		// title: "Paragon Bonus"
-	},
-	{
-		name: "time",
-		// title: "Time"
-	},
-	{
-		name: "resourceRetrieval",
-		// title: "resourceRetrieval"
-	},
-	{
-		name: "others",
-		// title: "Others"
-	}
+			name: "catnip",
+			// title: "Catnip / Sec"
+		},
+		{
+			name: "science",
+			// title: "Science"
+		},
+		{
+			name: "titanium",
+			// title: "Titanium"
+		},
+		{
+			name: "pollution",
+			// title: "Pollution"
+		},
+		{
+			name: "unicorns",
+			// title: "Unicorns""
+		},
+		{
+			name: "religion",
+			// title: "Religion"
+		},
+		{
+			name: "Transcend",
+			// title: "Transcend"
+		},
+		{
+			name: "paragon",
+			// title: "Paragon Bonus"
+		},
+		{
+			name: "time",
+			// title: "Time"
+		},
+		{
+			name: "resourceRetrieval",
+			// title: "resourceRetrieval"
+		},
+		{
+			name: "others",
+			// title: "Others"
+		}
 	],
 
 	statGroups: null,
@@ -1161,10 +1187,11 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		this.i18ng = i18ng;
 		this.statGroups = [];
 		var self = this;
-		if (lang && this.i18nData[lang])
+		if (lang && this.i18nData[lang]) {
 			this.lang = lang;
-		else
+		} else {
 			this.lang = "en";
+		}
 
 		this.statDefinitions.forEach(
 			function(statDefinition) {
@@ -1222,8 +1249,9 @@ dojo.declare("classes.tab.NummonTab", com.nuclearunicorn.game.ui.tab, {
 			for (var i in stats) {
 				var stat = stats[i];
 				var val = stat.val;
-				if (val == Infinity)
+				if (val == Infinity) {
 					val = "Infinity";
+				}
 
 				stat.val = this.game.nummon[stat.name]();
 
@@ -1240,7 +1268,7 @@ dojo.declare("classes.tab.NummonTab", com.nuclearunicorn.game.ui.tab, {
 	}
 });
 
-NummonInit = function() {
+var NummonInit = function() {
 	var i18ng = $I;
 	var lang = localStorage["com.nuclearunicorn.kittengame.language"];
 	var managers = [{
@@ -1263,13 +1291,15 @@ NummonInit = function() {
 	}, gamePage);
 	gamePage.nummonTab.visible = true;
 	var tabExists = false;
-	for (var i in gamePage.tabs)
+	for (var i in gamePage.tabs) {
 		if (gamePage.tabs[i].tabId == "Nummon") {
 			gamePage.tabs[i] == gamePage.nummonTab;
 			tabExists = true;
 		}
-	if (!tabExists)
+	}
+	if (!tabExists) {
 		gamePage.addTab(gamePage.nummonTab);
+	}
 
 	if (localStorage["com.nuclearunicorn.kittengame.language"] == "zh") {
 		gamePage.nummonTab.tabName = "概览";
@@ -1298,7 +1328,7 @@ NummonInit = function() {
 	};
 };
 
-NummonTryInit = function() {
+var NummonTryInit = function() {
 	if (typeof gamePage === "undefined") {
 		setTimeout(function() {
 			NummonTryInit();
@@ -1308,7 +1338,7 @@ NummonTryInit = function() {
 	}
 };
 
-box = function() {
+/* var box = function() {
 	if (this.game.resPool.get("elderBox").value == 0 && this.gamePage.resPool.get("wrappingPaper").value == 0) {
 		let time = new Date().getTime();
 		let time1 = new Date(2022, 0, 26).getTime();
@@ -1337,8 +1367,8 @@ box = function() {
 	}
 };
 
-var haveMsg;
-spring = function() {
+var spring = function() {
+	var haveMsg;
 	var springFestival = new Date(2022, 1, 1).getTime();
 	var now = new Date().getTime();
 	var totalTime = springFestival + 600000 - now;
@@ -1361,7 +1391,7 @@ spring = function() {
 	}
 };
 
-dailySign = function() {
+var dailySign = function() {
 	var a = localStorage['sign'] || 0;
 	var currentYear = new Date().getFullYear().toString();
 	var hasTimestamp = new Date() - new Date(currentYear);
@@ -1376,43 +1406,49 @@ dailySign = function() {
 		}).done(function(resp) {
 			if (resp) {
 				var day = resp.day_of_year;
-				var b = Math.floor(Math.random()*3);
+				var b = Math.floor(Math.random() * 3);
 				if (b === 0) {
 					var shipValue = game.resPool.get("ship").value;
-					if (!shipValue) {return;}
+					if (!shipValue) {
+						return;
+					}
 					do {
 						b++;
 					}
-					while (Math.floor(Math.random()*2))
-					var c =Math.max(game.resPool.get("ship").value*0.01, 1);
+					while (Math.floor(Math.random() * 2))
+					var c = Math.max(game.resPool.get("ship").value * 0.01, 1);
 					game.resPool.addResEvent("ship", b);
-					game.msg("除旧迎新，Cheney送上"+ game.getDisplayValueExt(b*c) +" 个贸易船", "important");
+					game.msg("除旧迎新，Cheney送上" + game.getDisplayValueExt(b * c) + " 个贸易船", "important");
 				} else if (b === 1) {
 					var shipValue = game.resPool.get("starchart").value;
-					if (!shipValue) {return;}
+					if (!shipValue) {
+						return;
+					}
 					do {
 						b++;
 					}
-					while (Math.floor(Math.random()*2))
-					var c =Math.max(game.resPool.get("starchart").value*0.01, 1);
+					while (Math.floor(Math.random() * 2))
+					var c = Math.max(game.resPool.get("starchart").value * 0.01, 1);
 					game.resPool.addResEvent("starchart", b);
-					game.msg("除旧迎新，Cheney送上"+ game.getDisplayValueExt(b*c) +" 星图", "important");
+					game.msg("除旧迎新，Cheney送上" + game.getDisplayValueExt(b * c) + " 星图", "important");
 				} else if (b === 2) {
 					var shipValue = game.resPool.get("unobtainium").value;
-					if (!shipValue) {return;}
+					if (!shipValue) {
+						return;
+					}
 					do {
 						b++;
 					}
-					while (Math.floor(Math.random()*2))
-					var c =Math.max(game.resPool.get("unobtainium").perTickCached, 1);
-					game.resPool.addResEvent("unobtainium", b*c);
-					game.msg("除旧迎新，Cheney送上"+ game.getDisplayValueExt(b*c) +" 难得素", "important");
+					while (Math.floor(Math.random() * 2))
+					var c = Math.max(game.resPool.get("unobtainium").perTickCached, 1);
+					game.resPool.addResEvent("unobtainium", b * c);
+					game.msg("除旧迎新，Cheney送上" + game.getDisplayValueExt(b * c) + " 难得素", "important");
 				}
 				localStorage['sign'] = resp.day_of_year;
 			}
 		});
 	}
-};
+};*/
 
 NummonTryInit();
 //box();
