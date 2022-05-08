@@ -300,6 +300,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	// SCIENCE :
 
 	getCelestialPerDay: function() {
+		if (game.bld.getBuildingExt('library').meta.on <= 0) {
+			return "0%";
+		}
 		var chanceRatio = 1;
 		if (this.game.prestige.getPerk("chronomancy").researched) {
 			chanceRatio *= 1.1;
@@ -317,6 +320,9 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	getCelestialAutoSuccess: function() {
+		if (game.bld.getBuildingExt('library').meta.on <= 0) {
+			return "0%";
+		}
 		var autoChance = this.game.getEffect("starAutoSuccessChance") * 100;
 		if (this.game.prestige.getPerk("astromancy").researched) {
 			autoChance *= 2;
@@ -505,7 +511,8 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			}
 		}
 		if (bestBuilding != unicornPastureKey) {
-			bestBuilding = "$religion.zu." + bestBuilding + ".label";}
+			bestBuilding = "$religion.zu." + bestBuilding + ".label";
+		}
 		return this.i18n(bestBuilding);
 	},
 
