@@ -275,10 +275,12 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 				break;
 			}
 		}
-		ColdWintercatnip -= 0.15;
-		ColdWintercatnip *= 1 + this.game.getLimitedDR(this.game.getEffect("coldHarshness"), 1);
-		if (game.science.getPolicy("communism").researched) {
-			ColdWintercatnip = 0;
+		if (game.calendar.year > 3) {
+			ColdWintercatnip -= 0.15;
+			ColdWintercatnip *= 1 + this.game.getLimitedDR(this.game.getEffect("coldHarshness"), 1);
+			if (game.science.getPolicy("communism").researched) {
+				ColdWintercatnip = 0;
+			}
 		}
 		var catnip = this.getPotentialCatnip(ColdWintercatnip);
 		return catnip;
