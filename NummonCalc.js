@@ -736,6 +736,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	getTradeTCAvg: function() {
+		if (!game.time.getCFU("ressourceRetrieval").val) {return 0;}
 		var CycleFestivalRatio = this.game.calendar.cycleEffectsFestival({
 			unobtainium: 1
 		})['unobtainium'];
@@ -780,7 +781,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		} else if (number == 100) {
 			return this.i18n("best.none");
 		} else if (timeC <= 0) {
-			return "烧水晶收入未大于燃烧水晶支出";
+			return "烧水晶收入小于1（支出）";
 		} else {
 			var TCBack = Math.ceil(cost * number / result);
 			var op = game.time.getCFU("blastFurnace").on;
@@ -1086,12 +1087,12 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		],
 		resourceRetrieval: [{
 				name: "getTradeTC",
-				// title: "Blazars for Shatter Engine",
+				title: "计算资源回复下每烧1年，当前周期难得素通过贸易利维的时间水晶期望收入",
 				val: 0,
 			},
 			{
 				name: "getTradeTCAvg",
-				// title: "Blazars for Shatter Engine",
+				title: "计算资源回复下每烧1年，平均周期下难得素通过贸易利维坦和天角兽的时间水晶期望收入",
 				val: 0,
 			},
 			{
