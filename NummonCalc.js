@@ -395,7 +395,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	// POLLUTION :
 
 	getPollutionTick: function() {
-		if (!this.game.science.get("ecology").researched) {
+		if (!this.game.science.get("ecology").researched && game.bld.cathPollution < 6e5) {
 			return this.i18n("best.none");
 		}
 		var precision = this.game.opts.forceHighPrecision ? 3 : 2;
@@ -422,7 +422,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	getCoMax: function() {
-		if (!this.game.science.get("ecology").researched) {
+		if (!this.game.science.get("ecology").researched && game.bld.cathPollution < 6e5) {
 			return this.i18n("best.none");
 		}
 		var UndissipatednPerTick = this.game.bld.getUndissipatedPollutionPerTick() * 100;
