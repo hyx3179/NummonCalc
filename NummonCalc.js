@@ -88,7 +88,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 			"titanium": "钛",
 
-			"getTitPerZebraTrade": "每次和斑马贸易获得的钛",
+			"getTitPerZebraTrade": "单次斑马贸易的钛期望数量",
 			"getZebraTradesLeftToMaxTit": "钛满仓还需要与斑马贸易(次)",
 			"getZebraTradesToMaxTit": "钛从零至满仓总共要与斑马贸易(次)",
 
@@ -369,17 +369,18 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	// TITANIUM :
 
 	getTitPerZebraTrade: function() {
+		let rRatio = 0.7 + Math.min(0.3, + game.getEffect("standingRatio") + game.diplomacy.calculateStandingFromPolicies('zebras', game));
 		var shipAmount = this.game.resPool.get("ship").value;
 		var zebraRelationModifierTitanium = this.game.getEffect("zebraRelationModifier") * 0.015;
-		var titaniumPerTrade = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium);
+		var titaniumPerTrade = (1.5 + shipAmount * 0.03) * (1 + zebraRelationModifierTitanium) * Math.min(0.15 + shipAmount * 0.0035, 1) * rRatio;
 		return titaniumPerTrade;
 	},
 
-	getZebraTradesToMaxTit: function() {
+	/*getZebraTradesToMaxTit: function() {
 		var titaniumPerTrade = this.getTitPerZebraTrade();
 		var maxTitanium = this.game.resPool.get("titanium").maxValue;
 		return Math.ceil(maxTitanium / titaniumPerTrade);
-	},
+	},*/
 
 	getZebraTradesLeftToMaxTit: function() {
 		var titaniumPerTrade = this.getTitPerZebraTrade();
@@ -718,7 +719,14 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	getTradeTC: function() {
-		var tRatio = 1 + this.game.diplomacy.getTradeRatio() + this.game.diplomacy.calculateTradeBonusFromPolicies("leviathans", this.game) + this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game);
+		let leaderRatio = 1;
+		if (this.game.science.getPolicy("monarchy").researched){
+			leaderRatio = 1.95;
+		}
+		let tradeR = (game.village.traits.some(obj => obj.name === 'merchant')) ? 1 + this.game.prestige.getBurnedParagonRatio() : 0;
+		tradeR = 0.03 * tradeR * leaderRatio;
+		tradeR += tradeR + this.game.getEffect("tradeRatio") + this.game.diplomacy.calculateTradeBonusFromPolicies("leviathans", this.game);
+		var tRatio = 1 + tradeR + this.game.challenges.getChallenge("pacifism").getTradeBonusEffect(this.game);
 		var cal = this.game.calendar;
 		var ticksPerYear = cal.ticksPerDay * cal.daysPerSeason * cal.seasonsPerYear;
 		var leviathansModel = this.game.diplomacy.get("leviathans");
@@ -970,7 +978,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		],
 		titanium: [{
 				name: "getTitPerZebraTrade",
-				// title: "Titanium Per Zebra Trade",
+				title: "与贸易船有关哦🚢",
 				val: 0,
 			},
 			{
