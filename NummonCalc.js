@@ -263,7 +263,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 		baseProd += this.game.getResourcePerTickConvertion('catnip');
 		baseProd *= 1 + this.game.timeAccelerationRatio();
-		baseProd *= this.game.ticksPerSecond;
+		baseProd *= (game.opts.usePerSecondValues) ? this.game.ticksPerSecond : 1;
 		return baseProd;
 	},
 
@@ -396,7 +396,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	// POLLUTION :
 
 	getPollutionTick: function() {
-		if (!this.game.science.get("ecology").researched && game.bld.cathPollution < 6e5) {
+		if (!this.game.science.get("ecology").researched && game.bld.cathPollution < 5e6) {
 			return this.i18n("best.none");
 		}
 		var precision = this.game.opts.forceHighPrecision ? 3 : 2;
