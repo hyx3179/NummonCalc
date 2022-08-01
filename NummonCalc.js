@@ -40,13 +40,13 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 			"getReligionProductionBonusCap": "Solar Revolution Limit",
 			"getlowestRatio": "下一次元超越等级减少的顿悟",
-			"getNextTranscendTierProgress": "Progress to Next Transcendence Tier",
+			"getEpiphany": "Progress to Next Transcendence Tier",
 			"getRecNextTranscendTierProgress": "Rec.Progress to Next Transcendence Tier",
 
 			"paragon": "Paragon Bonus",
 
 			"getParagonProductionBonus": "Production Bonus",
-			"getParagonStorageBonus": "Storage Bonus(include horizon)",
+			"getParagonStorageBonus": "Storage Bonus",
 
 			"time": "Time",
 
@@ -99,7 +99,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 			"unicorns": "独角兽宗教",
 
-			"getBestUniBuilding": "最佳独角兽建筑",
+			"getBestUniBuilding": "最佳独角兽性价比建筑",
 			"getBestAliBuilding": "象牙性价比最高天角兽建筑",
 			"getNecrocornsPerSecond": "每秒获得的死灵兽",
 			"getNecrocornTime": "距离下一个死灵兽的时间",
@@ -108,8 +108,8 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			"religion": "太阳教团",
 
 			"getReligionProductionBonusCap": "太阳革命极限加成",
-			"getNextTranscendTierProgress": "当前顿悟值",
-			"getAdore": "赞美群星后的顿悟值",
+			"getEpiphany": "当前顿悟值",
+			"getAfterAdoreEpiphany": "赞美群星后的顿悟值",
 			"getAdoreSloar": "赞美群星再赞美太阳的太阳革命加成",
 
 			"Transcend": "次元超越",
@@ -121,7 +121,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			"paragon": "领导力加成",
 
 			"getParagonProductionBonus": "生产加成",
-			"getParagonStorageBonus": "库存加成(含黑洞)",
+			"getParagonStorageBonus": "库存加成",
 			"getEffectLeader": "领袖特质效果",
 
 			"time": "时间",
@@ -579,7 +579,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var numMarkers = this.game.religion.getZU("marker").val;
 		var chance = 3.5 * numPyramids * (1 + 0.1 * numMarkers);
 		if (chance > 100) {
-			return chance = 100;
+			return chance = 100 + "%";
 		} else {
 			return this.game.getDisplayValueExt(chance) * 1 + "%";
 		}
@@ -593,11 +593,17 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		return result + "%";
 	},
 
-	getAdore: function() {
+	getAfterAdoreEpiphany: function() {
 		if (!game.religion.meta[1].meta[8].on) {
 			return this.i18n("best.none");
 		}
-		var ttPlus1 = (this.game.religion.getRU("transcendence").on ? this.game.religion.transcendenceTier : 0) + 1;
+		var tt = this.game.religion.transcendenceTier;
+		var ttPlus1 = 1;
+		if (this.game.religion.getRU("transcendence").on) {
+			ttPlus1 = 1 + tt;
+		} else if (tt) {
+			return '超越没点亲';
+		}
 		var faithRatio = this.game.religion.faithRatio;
 		return faithRatio + this.game.religion.faith * 1e-6 * ttPlus1 * ttPlus1 * 1.01;
 	},
@@ -642,12 +648,8 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		}
 	},
 
-	getNextTranscendTierProgress: function() {
-		if (this.game.religion.transcendenceTier >= 355) {
-			return "∞";
-		} else {
-			return this.game.religion.faithRatio;
-		}
+	getEpiphany: function() {
+		return this.game.religion.faithRatio;
 	},
 
 	getBoolean: function() {
@@ -658,7 +660,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var tt = this.game.religion._getTranscendTotalPrice(tier) - game.religion._getTranscendTotalPrice(tier - 1);
 		var boolean = "";
 		if (this.game.religion.faithRatio < this.getRecNextTranscendTierProgress()) {
-			boolean = "否";
+			return boolean = "否";
 		} else {
 			boolean = "是";
 		}
@@ -679,10 +681,10 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	getParagonStorageBonus: function() {
-		var storeRatio = 1 + this.game.prestige.getParagonStorageRatio();
-		var singularity = 1 + this.game.getEffect("globalResourceRatio");
-		storeRatio = this.game.getDisplayValueExt(storeRatio * 100 * singularity - 100);
-		return storeRatio + "%";
+		// var storeRatio = 1 + this.game.prestige.getParagonStorageRatio();
+		// var singularity = 1 + this.game.getEffect("globalResourceRatio");
+		// storeRatio = this.game.getDisplayValueExt(storeRatio * 100 * singularity - 100);
+		return this.game.prestige.getParagonStorageRatio() + "%";
 	},
 
 	getEffectLeader: function() {
@@ -819,11 +821,8 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},*/
 
 	getUraniumForThoriumReactors: function() {
-		if (!game.workshop.get("thoriumReactors").researched) {
-			return this.i18n("best.none");
-		}
 		var uraniumTick = -0.001 * (1 - game.getEffect("uraniumRatio")) * this.game.bld.getBuildingExt("reactor").meta.on;
-		var thorimTick = game.getEffect("reactorThoriumPerTick");
+		var thorimTick = game.getEffect("reactorThoriumPerTick") || -0.05;
 		var needed = 250 * thorimTick * this.game.bld.getBuildingExt("reactor").meta.on;
 		needed /= 1 + this.game.getResCraftRatio("thorium");
 		needed += uraniumTick;
@@ -873,10 +872,14 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var arrayVal = game.space.getBuilding("orbitalArray").val;
 		var spaceRatio = 1 + this.game.getEffect("spaceRatio");
 		var elevatorup = (0.01 + spaceRatio) * arrayPrices * 1000;
-		var arrayup = (0.02 + spaceRatio) * elevatorPrices * (1 + this.game.getCraftRatio("chemist"));
+		let leaderRatio = 1;
+		if (this.game.science.getPolicy("monarchy").researched) {leaderRatio = 1.95;}
+		let craftR = (game.village.traits.some(obj => obj.name === 'chemist')) ? 1 + this.game.prestige.getBurnedParagonRatio() : 0;
+		craftR = 0.075 * craftR * leaderRatio;
+		var arrayup = (0.02 + spaceRatio) * elevatorPrices * (1 + this.game.getCraftRatio("chemist") + craftR);
 		if (elevatorup >= arrayup) {
 			if (elevatorPrices > game.resPool.resources[9].maxValue) {
-				return this.i18n("best.none");
+				return '难得素上限了';
 			}
 			var number = 1;
 			while (elevatorup >= arrayup && elevatorPrices < Number.MAX_VALUE / 1.15) {
@@ -1035,13 +1038,11 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 				val: 0,
 			},
 			{
-				name: "getNextTranscendTierProgress",
-				// title: "Apocrypha Progress",
+				name: "getEpiphany",
 				val: 0,
 			},
 			{
-				name: "getAdore",
-				// title: "Solar Revolution Limit",
+				name: "getAfterAdoreEpiphany",
 				val: 0,
 			},
 			{
@@ -1249,6 +1250,9 @@ dojo.declare("classes.tab.NummonTab", com.nuclearunicorn.game.ui.tab, {
 		game.religionTab.render();
 		this.update();
 	},
+	// onClickName: function(e){
+    //         console.log(e)
+    // },
 
 	update: function() {
 		dojo.empty(this.container);
@@ -1256,12 +1260,13 @@ dojo.declare("classes.tab.NummonTab", com.nuclearunicorn.game.ui.tab, {
 		for (var idx in this.game.nummon.statGroups) {
 			var statGroup = this.game.nummon.statGroups[idx];
 			dojo.create("h1", {
-				innerHTML: statGroup.title
+				innerHTML: statGroup.title,
+				// onclick: this.onClickName,
 			}, this.container);
 
 			var stats = statGroup.group;
 			var table = dojo.create("table", {
-				class: 'statTable'
+				class: 'statTable',
 			}, this.container);
 
 			for (var i in stats) {
@@ -1276,7 +1281,7 @@ dojo.declare("classes.tab.NummonTab", com.nuclearunicorn.game.ui.tab, {
 				var tr = dojo.create("tr", null, table);
 				dojo.create("td", {
 					innerHTML: this.game.nummon.i18n(stat.name),
-					title: (stat.title) ? stat.title : ''
+					title: (stat.title) ? stat.title : '',
 				}, tr);
 				dojo.create("td", {
 					innerHTML: typeof val == "number" ? this.game.getDisplayValueExt(val) : val
