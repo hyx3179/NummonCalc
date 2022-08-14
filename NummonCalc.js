@@ -501,7 +501,6 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 					amor -= total;
 					amor = amor + riftBonus;
 					amor = unicornPrice / amor;
-
 					if (amor < bestAmoritization) {
 						if (riftBonus > 0 || relBonus > religionRatio && unicornPrice > 0) {
 							bestAmoritization = amor;
@@ -795,7 +794,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		} else {
 			var TCBack = Math.ceil(cost * number / result);
 			var op = game.time.getCFU("blastFurnace").on;
-			TCBack = 50 * TCBack / op;
+			TCBack = 50 * TCBack / (op + 0.5);
 			return this.game.toDisplaySeconds(TCBack);
 		}
 	},
