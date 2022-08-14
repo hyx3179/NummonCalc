@@ -684,7 +684,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		// var storeRatio = 1 + this.game.prestige.getParagonStorageRatio();
 		// var singularity = 1 + this.game.getEffect("globalResourceRatio");
 		// storeRatio = this.game.getDisplayValueExt(storeRatio * 100 * singularity - 100);
-		return this.game.prestige.getParagonStorageRatio() + "%";
+		return this.game.getDisplayValueExt(this.game.prestige.getParagonStorageRatio()) + "%";
 	},
 
 	getEffectLeader: function() {
