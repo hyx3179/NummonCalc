@@ -330,7 +330,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			autoChance *= 2;
 		}
 		if (game.ironWill) {
-			autoChance = Math.max(26, autoChance);
+			autoChance = Math.max(25, autoChance);
 		}
 		autoChance = Math.round(autoChance);
 		if (autoChance > 100 || this.game.workshop.get("seti").researched) {
@@ -588,8 +588,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 	getReligionProductionBonusCap: function() {
 		var result = 100 * (10 + this.game.getEffect("solarRevolutionLimit") + (this.game.challenges.getChallenge("atheism").researched ? (this.game.religion.transcendenceTier) : 0)) * (1 + this.game.getLimitedDR(this.game.getEffect("faithSolarRevolutionBoost"), 4));
-		result = this.game.getDisplayValueExt(result);
-		return result + "%";
+		return this.game.getDisplayValueExt(result) + "%";
 	},
 
 	getAfterAdoreEpiphany: function() {
@@ -659,7 +658,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var tt = this.game.religion._getTranscendTotalPrice(tier) - game.religion._getTranscendTotalPrice(tier - 1);
 		var boolean = "";
 		if (this.game.religion.faithRatio < this.getRecNextTranscendTierProgress()) {
-			return boolean = "否";
+			return "否";
 		} else {
 			boolean = "是";
 		}
@@ -675,15 +674,14 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 	getParagonProductionBonus: function() {
 		var prodRatio = this.game.prestige.getParagonProductionRatio() * 100;
-		prodRatio = Math.round(prodRatio * 1000) / 1000;
-		return prodRatio + "%";
+		return this.game.getDisplayValueExt(prodRatio) + "%";
 	},
 
 	getParagonStorageBonus: function() {
 		// var storeRatio = 1 + this.game.prestige.getParagonStorageRatio();
 		// var singularity = 1 + this.game.getEffect("globalResourceRatio");
 		// storeRatio = this.game.getDisplayValueExt(storeRatio * 100 * singularity - 100);
-		return this.game.getDisplayValueExt(this.game.prestige.getParagonStorageRatio()) + "%";
+		return this.game.getDisplayValueExt(this.game.prestige.getParagonStorageRatio() * 100) + "%";
 	},
 
 	getEffectLeader: function() {
@@ -752,7 +750,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var CycleEffects = this.game.calendar.cycleEffectsBasics({
 			unobtainiumPerTickSpace: 1
 		}, "moonOutpost")['unobtainiumPerTickSpace'];
-		var calendar = (56.5 + 12 * this.game.getEffect("festivalRatio")) / 50;
+		var calendar = (this.game.prestige.getPerk("numeromancy").researched && this.game.calendar.festivalDays) ? 1 : (56.5 + 12 * this.game.getEffect("festivalRatio")) / 50;
 		var tradeVal = calendar * this.getTradeTC() / CycleFestivalRatio / CycleEffects;
 		var shatter = this.game.getEffect("shatterTCGain") * (1 + this.game.getEffect("rrRatio"));
 
