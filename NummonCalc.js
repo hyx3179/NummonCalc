@@ -750,17 +750,14 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var CycleEffects = this.game.calendar.cycleEffectsBasics({
 			unobtainiumPerTickSpace: 1
 		}, "moonOutpost")['unobtainiumPerTickSpace'];
-		var calendar = (this.game.prestige.getPerk("numeromancy").researched && this.game.calendar.festivalDays) ? 1 : (56.5 + 12 * this.game.getEffect("festivalRatio")) / 50;
+		var calendar = (this.game.prestige.getPerk("numeromancy").researched && this.game.calendar.festivalDays) ? (56.5 + 12 * this.game.getEffect("festivalRatio")) / 50 : 1;
 		var tradeVal = calendar * this.getTradeTC() / CycleFestivalRatio / CycleEffects;
 		var shatter = this.game.getEffect("shatterTCGain") * (1 + this.game.getEffect("rrRatio"));
 
-		var aliChance = this.game.getEffect("alicornChance");
 		var tcRefineRatio = 0.04 * (1 + this.game.getEffect("tcRefineRatio"));
-		aliChance *= 1 + this.game.getLimitedDR(game.getEffect("alicornPerTickRatio"), 1.2);
-		var aliChanceTick = Math.min(aliChance, 1) * 0.2 * (1 + this.game.timeAccelerationRatio());
 		var alicornTick = this.game.getResourcePerTick("alicorn") * tcRefineRatio;
 		// ticksPerYear = 10 * 100 *4
-		var Sacrifice = alicornTick * 4000 * shatter + aliChanceTick * tcRefineRatio;
+		var Sacrifice = alicornTick * 4000 * shatter;
 		var timeCrystalVal = tradeVal + Sacrifice;
 		return timeCrystalVal;
 	},
