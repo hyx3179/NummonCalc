@@ -219,7 +219,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			if (decimal == "." + Array(numDigits + 1).join("0")) {
 				num = num.substr(0, num.indexOf("."));
 			}
-			for (var i = (num.indexOf(".") != -1 ? num.indexOf(".") - 3 : num.length - 3); i > 0; i -= 3) {
+			for (var i = (num.indexOf(".") == -1 ? num.length - 3 : num.indexOf(".") - 3); i > 0; i -= 3) {
 				num = num.substr(0, i) + "," + num.substr(i);
 			}
 		} else {
@@ -396,9 +396,6 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	// POLLUTION :
 
 	getPollutionTick: function() {
-		if (!this.game.science.get("ecology").researched && game.bld.cathPollution < 5e6) {
-			return this.i18n("best.none");
-		}
 		var precision = this.game.opts.forceHighPrecision ? 3 : 2;
 		var polltionPerTick = this.game.bld.cathPollutionPerTick * this.game.getTicksPerSecondUI();
 		if (this.game.bld.cathPollution == 0 || !polltionPerTick) {
@@ -423,9 +420,6 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	getCoMax: function() {
-		if (!this.game.science.get("ecology").researched && game.bld.cathPollution < 6e5) {
-			return this.i18n("best.none");
-		}
 		var UndissipatednPerTick = this.game.bld.getUndissipatedPollutionPerTick() * 100;
 		var coMax = Math.max(UndissipatednPerTick, 0);
 		if (this.game.challenges.isActive("postApocalypse") && coMax) {
@@ -499,7 +493,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 					var amor = unicornsPerSecond * globalRatio * relBonus * paragonRatio * faithBonus * cycle;
 					amor -= total;
-					amor = amor + riftBonus;
+					amor += riftBonus;
 					amor = unicornPrice / amor;
 					if (amor < bestAmoritization) {
 						if (riftBonus > 0 || relBonus > religionRatio && unicornPrice > 0) {
@@ -593,7 +587,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 	getAfterAdoreEpiphany: function() {
 		if (!game.religion.meta[1].meta[8].on) {
-			return this.i18n("best.none");
+			return game.religion.meta[1].meta[8].label;
 		}
 		var tt = this.game.religion.transcendenceTier;
 		var ttPlus1 = 1;
@@ -634,6 +628,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var tt = this.game.religion._getTranscendTotalPrice(tier) - game.religion._getTranscendTotalPrice(tier - 1);
 		var obelisk = this.game.religion.getTU("blackObelisk").val;
 		var obeliskRatio = (tier * 5 * obelisk + 1000) / (this.game.religion.transcendenceTier * 5 * obelisk + 1000);
+		if (game.getEffect('shatterTCGain') > 0.07) {obeliskRatio = 1;}
 		var adoreIncreaceRatio = Math.pow((tier + 1) / tier, 2);
 		var needpercent = adoreIncreaceRatio * obeliskRatio;
 		var x = tt;
@@ -651,23 +646,26 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	},
 
 	getBoolean: function() {
-		if (!game.religion.getRU("transcendence").on || this.game.religion.transcendenceTier >= 354) {
+		if ( this.game.religion.transcendenceTier >= 354) {
 			return this.i18n("best.none");
+		}
+		if (!game.religion.getRU("transcendence").on) {
+			return '亲超越没点';
 		}
 		var tier = this.game.religion.transcendenceTier + 1;
 		var tt = this.game.religion._getTranscendTotalPrice(tier) - game.religion._getTranscendTotalPrice(tier - 1);
-		var boolean = "";
+		var recommend = "";
 		if (this.game.religion.faithRatio < this.getRecNextTranscendTierProgress()) {
 			return "否";
 		} else {
-			boolean = "是";
+			recommend = "是";
 		}
 		if (this.game.religion.faith * 2.02 * (tier - 1) + 3.03 * this.game.religion.faith >= 1e6 * tt && this.game.religion.faithRatio > tt) {
-			boolean = "是";
-		} else if (this.game.religion.faith < 1e5) {
-			boolean = "否（虔诚太少）";
+			recommend = "是";
+		} else if (this.game.religion.faith < 1e5 && !recommend) {
+			recommend = "否（虔诚太少）";
 		}
-		return boolean;
+		return recommend;
 	},
 
 	// PARAGON :
@@ -708,13 +706,15 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	//TIME
 
 	getTCPerSacrifice: function() {
-		var numTCPerSacrifice = 1;
-		numTCPerSacrifice += this.game.getEffect("tcRefineRatio");
+		var tc = this.game.getEffect("tcRefineRatio") + 1;
+		var all = Math.floor(game.resPool.resourceMap['alicorn'].value / 25) * tc;
+		var numTCPerSacrifice =  game.getDisplayValueExt(tc) + '  ( '  + game.getDisplayValueExt(all) + ')';
 		return numTCPerSacrifice;
 	},
 
 	getRelicPerTCRefine: function() {
-		return 1 + this.game.getEffect("relicRefineRatio") * this.game.religion.getZU("blackPyramid").getEffectiveValue(this.game);
+		var number = 1 + this.game.getEffect("relicRefineRatio") * this.game.religion.getZU("blackPyramid").getEffectiveValue(this.game);
+		return  game.getDisplayValueExt(number) + '  ('  + game.getDisplayValueExt(Math.floor(game.resPool.resourceMap['timeCrystal'].value / 25) * number) + ')';
 	},
 
 	getTradeTC: function() {
@@ -831,19 +831,21 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			return this.i18n("$religion.tu.blackNexus.label");
 		}
 		var next;
-		var cs = Math.floor(Math.log((15 + this.game.religion.getZU("blackPyramid").getEffectiveValue(this.game)) / 5) / Math.log(1.15)) + 1;
+		let maxSorrow = this.game.getEffect('blsLimit') + 16;
+		var cs = Math.floor(Math.log(maxSorrow / 5) / Math.log(1.15)) + 1;
 		var cs1 = 0;
 		var cs2 = Math.ceil(this.getButtonPrice("religion", 0, "blackPyramid", "sorrow")) - this.game.resPool.get("sorrow").maxValue;
-		var bnexus = this.getButtonPrice("religion", 2, "blackNexus", "relic");
-		var bcore = this.getButtonPrice("religion", 2, "blackCore", "relic");
-		var a = (Math.pow(1.15, cs2) - 1) / 0.15 * bcore;
-		var bnexusup = 0.001 * cs / bnexus;
-		var bcoreup = 0.001 * this.game.religion.getTU("blackNexus").val / a;
-		if (cs2 > 0 && bnexusup >= bcoreup) {
-			while (bnexusup >= bcoreup && bnexus < Number.MAX_VALUE / 1.15) {
-				bnexus *= 1.15;
-				bnexusup = 0.001 * cs / bnexus;
-				bcoreup += 0.001 / a;
+		var nexusPrice = this.getButtonPrice("religion", 2, "blackNexus", "relic");
+		var corePrice = this.getButtonPrice("religion", 2, "blackCore", "relic");
+		// 总连结需要的遗物数量
+		var a = (Math.pow(1.15, cs2) - 1) / 0.15 * corePrice;
+		var NexusDB = 0.001 * cs / nexusPrice;
+		var core = 0.001 * this.game.religion.getTU("blackNexus").val / a;
+		if (cs2 > 0 && NexusDB >= core) {
+			while (NexusDB >= core && nexusPrice < Number.MAX_VALUE / 1.15) {
+				nexusPrice *= 1.15;
+				NexusDB = 0.001 * cs / nexusPrice;
+				core += 0.001 / a;
 				cs1++;
 			}
 			next = this.i18n("$religion.tu.blackNexus.label") + " +" + cs1 + "个";
@@ -870,7 +872,8 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		if (this.game.science.getPolicy("monarchy").researched) {leaderRatio = 1.95;}
 		let craftR = (game.village.traits.some(obj => obj.name === 'chemist')) ? 1 + this.game.prestige.getBurnedParagonRatio() : 0;
 		craftR = 0.075 * craftR * leaderRatio;
-		var arrayup = (0.02 + spaceRatio) * elevatorPrices * (1 + this.game.getCraftRatio("chemist") + craftR);
+		let factory = (0.02 + spaceRatio)  * (1 + this.game.getEffect("craftRatio") + craftR);
+		var arrayup = factory * elevatorPrices ;
 		if (elevatorup >= arrayup) {
 			if (elevatorPrices > game.resPool.resources[9].maxValue) {
 				return '难得素上限了';
@@ -879,7 +882,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			while (elevatorup >= arrayup && elevatorPrices < Number.MAX_VALUE / 1.15) {
 				elevatorPrices *= 1.15;
 				spaceRatio += 0.01;
-				arrayup = (0.02 + spaceRatio) * elevatorPrices * (1 + this.game.getCraftRatio("chemist"));
+				arrayup = factory * elevatorPrices;
 				elevatorup = (0.01 + spaceRatio) * arrayPrices * 1000;
 				number++;
 			}
@@ -1308,9 +1311,8 @@ var NummonInit = function() {
 	}, gamePage);
 	gamePage.nummonTab.visible = true;
 	var tabExists = false;
-	for (var i in gamePage.tabs) {
+	for (let i in gamePage.tabs) {
 		if (gamePage.tabs[i].tabId == "Nummon") {
-			gamePage.tabs[i] == gamePage.nummonTab;
 			tabExists = true;
 		}
 	}
