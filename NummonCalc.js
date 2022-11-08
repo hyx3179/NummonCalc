@@ -708,15 +708,24 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	getTCPerSacrifice: function() {
 		var tc = this.game.getEffect("tcRefineRatio") + 1;
 		var all = Math.floor(game.resPool.resourceMap['alicorn'].value / 25) * tc;
-		var numTCPerSacrifice =  game.getDisplayValueExt(tc) + '  ( '  + game.getDisplayValueExt(all) + ')';
+		var numTCPerSacrifice =  game.getDisplayValueExt(tc);
+		if (all) {
+			numTCPerSacrifice += ' (' + game.getDisplayValueExt(all) + ')';
+		}
 		return numTCPerSacrifice;
 	},
 
 	getRelicPerTCRefine: function() {
 		var number = 1 + this.game.getEffect("relicRefineRatio") * this.game.religion.getZU("blackPyramid").getEffectiveValue(this.game);
-		return  game.getDisplayValueExt(number) + '  ('  + game.getDisplayValueExt(Math.floor(game.resPool.resourceMap['timeCrystal'].value / 25) * number) + ')';
+		var allNumber = Math.floor(game.resPool.resourceMap['timeCrystal'].value / 25) * number;
+		var RelicPerTCRefine = game.getDisplayValueExt(number);
+		if (allNumber) {
+			RelicPerTCRefine += ' (' + game.getDisplayValueExt(allNumber) + ')';
+		}
+		return RelicPerTCRefine;
 	},
 
+	//getTC
 	getTradeTC: function() {
 		let leaderRatio = 1;
 		if (this.game.science.getPolicy("monarchy").researched){
@@ -761,7 +770,6 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var timeCrystalVal = tradeVal + Sacrifice;
 		return timeCrystalVal;
 	},
-	//getTC
 
 	getResourceRetrievalTCBackYears: function() {
 		var shatterRe = 1 + this.game.getLimitedDR(this.game.getEffect("shatterCostReduction"), 1);
@@ -780,17 +788,19 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var result = calendar * unobtainiumAvg;
 		var cost = this.getButtonPrice("time", 0, "ressourceRetrieval", "timeCrystal");
 		var number = this.game.time.getCFU("ressourceRetrieval").val;
-		if (!this.game.time.getCFU("ressourceRetrieval").unlocked) {
-			return this.i18n("$time.cfu.ressourceRetrieval.label");
-		} else if (number == 100) {
-			return this.i18n("best.none");
-		} else if (timeC <= 0) {
-			return "烧水晶收入小于1（支出）";
+		if (this.game.time.getCFU("ressourceRetrieval").unlocked) {
+			if (number == 100) {
+				return this.i18n("best.none");
+			} else if (timeC <= 0) {
+				return "烧水晶收入小于1（支出）";
+			} else {
+				var TCBack = Math.ceil(cost * number / result);
+				var op = game.time.getCFU("blastFurnace").on;
+				TCBack = 50 * TCBack / (op + 0.5);
+				return this.game.toDisplaySeconds(TCBack);
+			}
 		} else {
-			var TCBack = Math.ceil(cost * number / result);
-			var op = game.time.getCFU("blastFurnace").on;
-			TCBack = 50 * TCBack / (op + 0.5);
-			return this.game.toDisplaySeconds(TCBack);
+			return this.i18n("$time.cfu.ressourceRetrieval.label");
 		}
 	},
 	// OTHERS
@@ -867,23 +877,24 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		var elevatorVal = game.space.getBuilding("spaceElevator").val;
 		var arrayVal = game.space.getBuilding("orbitalArray").val;
 		var spaceRatio = 1 + this.game.getEffect("spaceRatio");
-		var elevatorup = (0.01 + spaceRatio) * arrayPrices * 1000;
 		let leaderRatio = 1;
 		if (this.game.science.getPolicy("monarchy").researched) {leaderRatio = 1.95;}
 		let craftR = (game.village.traits.some(obj => obj.name === 'chemist')) ? 1 + this.game.prestige.getBurnedParagonRatio() : 0;
+		// elevatorPrice / elevatorup = arrayPrices / arrayUp
 		craftR = 0.075 * craftR * leaderRatio;
-		let factory = (0.02 + spaceRatio)  * (1 + this.game.getEffect("craftRatio") + craftR);
-		var arrayup = factory * elevatorPrices ;
-		if (elevatorup >= arrayup) {
+
+		var elevatorUp = elevatorPrices * 100;
+		var arrayup = arrayPrices * 1000 * 50 / (1 + this.game.getEffect("craftRatio") + craftR);
+		if (elevatorUp < arrayup) {
 			if (elevatorPrices > game.resPool.resources[9].maxValue) {
 				return '难得素上限了';
 			}
 			var number = 1;
-			while (elevatorup >= arrayup && elevatorPrices < Number.MAX_VALUE / 1.15) {
+			while (elevatorUp < arrayup && elevatorPrices < Number.MAX_VALUE / 1.15) {
 				elevatorPrices *= 1.15;
 				spaceRatio += 0.01;
-				arrayup = factory * elevatorPrices;
-				elevatorup = (0.01 + spaceRatio) * arrayPrices * 1000;
+				elevatorUp = elevatorPrices * 100;
+				// elevatorUp = (0.01 + spaceRatio) * arrayPrices * 1000;
 				number++;
 			}
 			return $I("space.planet.cath.spaceElevator.label") + " +" + number + "个";
@@ -916,12 +927,13 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 	getFutureSeason: function() {
 		var TemporalParadox = this.game.calendar.futureSeasonTemporalParadox;
+		var time;
 		if (this.game.bld.get("chronosphere").on == 0) {
 			return this.i18n("best.none");
 		} else if (TemporalParadox == -1) {
-			var time = 1;
+			time = 1;
 		} else {
-			var time = TemporalParadox + 1;
+			time = TemporalParadox + 1;
 		}
 		return time;
 	},
