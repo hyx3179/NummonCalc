@@ -139,7 +139,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 
 			"getBestMagnetoBuilding": "最佳磁电机/蒸汽工坊",
 			"getUraniumForThoriumReactors": "每秒钍反应堆等效总耗铀",
-			"getDarkFutureYears": "距离黑暗未来的惩罚(年)",
+			"getDarkFutureYears": "黑暗未来的惩罚倒计时(年)",
 			"getBestRelicBuilding": "获取最佳遗物建筑",
 			"getBestUnobtainiumBuilding": "难得素最佳太空建筑",
 			"getAIlv15Time": "天网觉醒倒计时(现实)",
@@ -157,7 +157,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		if (key[0] == "$") {
 			return this.i18ng(key.slice(1));
 		}
-		var value = this.i18nData[this.lang][key];
+		var value = this.i18nData['zh'][key];
 		if (!value) {
 			value = this.i18nData["en"][key];
 			if (!value) {
@@ -174,13 +174,13 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		return value;
 	},
 
-	roundThisNumber: function(num) {
-		num *= 1000;
-		num += .5;
-		num = Math.floor(num);
-		num /= 1000;
-		return num;
-	},
+	// roundThisNumber: function(num) {
+	// 	num *= 1000;
+	// 	num += .5;
+	// 	num = Math.floor(num);
+	// 	num /= 1000;
+	// 	return num;
+	// },
 
 	getButton: function(tab, buttonName) {
 		for (var i in this.game.tabs[tab].children) {
@@ -211,22 +211,22 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		return cost * Math.pow(priceRatio, metaData.on);
 	},
 
-	makeNiceString: function(num, numDigits = 3) {
-		if (typeof(num) == "number" && num != Infinity) {
-			num = num.toFixed(numDigits);
-			num = num.toString();
-			var decimal = num.substr(num.indexOf("."));
-			if (decimal == "." + Array(numDigits + 1).join("0")) {
-				num = num.substr(0, num.indexOf("."));
-			}
-			for (var i = (num.indexOf(".") == -1 ? num.length - 3 : num.indexOf(".") - 3); i > 0; i -= 3) {
-				num = num.substr(0, i) + "," + num.substr(i);
-			}
-		} else {
-			num = num.toString();
-		}
-		return num;
-	},
+	// makeNiceString: function(num, numDigits = 3) {
+	// 	if (typeof(num) == "number" && num != Infinity) {
+	// 		num = num.toFixed(numDigits);
+	// 		num = num.toString();
+	// 		var decimal = num.substr(num.indexOf("."));
+	// 		if (decimal == "." + Array(numDigits + 1).join("0")) {
+	// 			num = num.substr(0, num.indexOf("."));
+	// 		}
+	// 		for (var i = (num.indexOf(".") == -1 ? num.length - 3 : num.indexOf(".") - 3); i > 0; i -= 3) {
+	// 			num = num.substr(0, i) + "," + num.substr(i);
+	// 		}
+	// 	} else {
+	// 		num = num.toString();
+	// 	}
+	// 	return num;
+	// },
 
 	// CATNIP :
 
@@ -708,7 +708,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	getTCPerSacrifice: function() {
 		var tc = this.game.getEffect("tcRefineRatio") + 1;
 		var all = Math.floor(game.resPool.resourceMap['alicorn'].value / 25) * tc;
-		var numTCPerSacrifice =  game.getDisplayValueExt(tc);
+		var numTCPerSacrifice = game.getDisplayValueExt(tc);
 		if (all) {
 			numTCPerSacrifice += ' (' + game.getDisplayValueExt(all) + ')';
 		}
@@ -1251,12 +1251,48 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 dojo.declare("classes.tab.NummonTab", com.nuclearunicorn.game.ui.tab, {
 
 	container: null,
+	isEditMode: null,
 
 	constructor: function(tabName) {},
 
 	render: function(content) {
+		this.children = [];
+		if (this.container) {
+			dojo.empty(this.container);
+		}
 		this.container = content;
-		game.religionTab.render();
+		let statGroups = this.game.nummon.statGroups;
+		for (var idx in statGroups) {
+			var statGroup = statGroups[idx];
+			dojo.create("h1", {
+				innerHTML: statGroup.title,
+				// onclick: this.onClickName,
+			}, this.container);
+
+			var stats = statGroup.group;
+				var table = dojo.create("table", {
+					class: 'statTable',
+				}, this.container);
+			for (var i in stats) {
+				var stat = stats[i];
+				stat.val = this.game.nummon[stat.name]();
+				var val = stat.val;
+
+				var tr = dojo.create("tr", null, table);
+				dojo.create("td", {
+					innerHTML: this.game.nummon.i18n(stat.name),
+					title: (stat.title) ? stat.title : '',
+				}, tr);
+				var c = dojo.create("td", {
+					innerHTML: typeof val == "number" ? this.game.getDisplayValueExt(val) : val
+				}, tr);
+				var obc = {};
+				obc.node = c;
+				obc.name = stat.name;
+				obc.val = val;
+				this.children.push(obc);
+			}
+		}
 		this.update();
 	},
 	// onClickName: function(e){
@@ -1264,37 +1300,12 @@ dojo.declare("classes.tab.NummonTab", com.nuclearunicorn.game.ui.tab, {
     // },
 
 	update: function() {
-		dojo.empty(this.container);
-
-		for (var idx in this.game.nummon.statGroups) {
-			var statGroup = this.game.nummon.statGroups[idx];
-			dojo.create("h1", {
-				innerHTML: statGroup.title,
-				// onclick: this.onClickName,
-			}, this.container);
-
-			var stats = statGroup.group;
-			var table = dojo.create("table", {
-				class: 'statTable',
-			}, this.container);
-
-			for (var i in stats) {
-				var stat = stats[i];
-				var val = stat.val;
-				if (val == Infinity) {
-					val = "Infinity";
-				}
-
-				stat.val = this.game.nummon[stat.name]();
-
-				var tr = dojo.create("tr", null, table);
-				dojo.create("td", {
-					innerHTML: this.game.nummon.i18n(stat.name),
-					title: (stat.title) ? stat.title : '',
-				}, tr);
-				dojo.create("td", {
-					innerHTML: typeof val == "number" ? this.game.getDisplayValueExt(val) : val
-				}, tr);
+		for (var i in this.children) {
+			var obc = this.children[i];
+			var val = this.game.nummon[obc.name]();
+			if (obc.val !== val) {
+				obc.node.innerText = typeof val == "number" ? this.game.getDisplayValueExt(val) : val;
+				obc.val = val;
 			}
 		}
 	}
@@ -1357,6 +1368,7 @@ var NummonInit = function() {
 				return this.challengesTab;
 		}
 	};
+	game.religionTab.render();
 };
 
 var NummonTryInit = function() {
