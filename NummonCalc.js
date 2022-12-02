@@ -4,7 +4,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 	lang: "en",
 	i18ng: null,
 	i18nData: {
-		"en": {
+		/*"en": {
 			"catnip": "Catnip / Sec",
 
 			"getCatnipInWarmSpring": "During Warm Spring",
@@ -72,7 +72,7 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			"infinity": "Infinity",
 			"sec": "/sec",
 			"done": "Done",
-		},
+		},*/
 		"zh": {
 			"catnip": "猫薄荷 / 秒",
 
@@ -1343,7 +1343,7 @@ var NummonInit = function() {
 		gamePage.addTab(gamePage.nummonTab);
 	}
 
-	if (localStorage["com.nuclearunicorn.kittengame.language"] == "zh") {
+	if (localStorage["com.nuclearunicorn.kittengame.language"] != "en") {
 		gamePage.nummonTab.tabName = "概览";
 	}
 	gamePage.render(true);
