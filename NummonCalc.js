@@ -988,33 +988,6 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 				val: 0,
 			}
 		],
-		titanium: [{
-				name: "getTitPerZebraTrade",
-				title: "与贸易船有关哦🚢",
-				val: 0,
-			},
-			{
-				name: "getZebraTradesLeftToMaxTit",
-				// title: "Trades Left to Cap Titanium",
-				val: 0,
-			},
-			//{
-			//    name: "getZebraTradesToMaxTit",
-			//    // title: "Max Zebra Trades to Cap Titanium",
-			//    val: 0,
-			//},
-		],
-		pollution: [{
-				name: "getPollutionTick",
-				// title: "Production Bonus",
-				val: 0,
-			},
-			{
-				name: "getCoMax",
-				// title: "Storage Bonus",
-				val: 0,
-			},
-		],
 		unicorns: [{
 				name: "getBestUniBuilding",
 				// title: "Best Unicorn Building",
@@ -1159,7 +1132,34 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 				name: "getadjustDay",
 				val: 0,
 			}
-		]
+		],
+		titanium: [{
+				name: "getTitPerZebraTrade",
+				title: "与贸易船有关哦🚢",
+				val: 0,
+			},
+			{
+				name: "getZebraTradesLeftToMaxTit",
+				// title: "Trades Left to Cap Titanium",
+				val: 0,
+			},
+			//{
+			//    name: "getZebraTradesToMaxTit",
+			//    // title: "Max Zebra Trades to Cap Titanium",
+			//    val: 0,
+			//},
+		],
+		pollution: [{
+				name: "getPollutionTick",
+				// title: "Production Bonus",
+				val: 0,
+			},
+			{
+				name: "getCoMax",
+				// title: "Storage Bonus",
+				val: 0,
+			},
+		],
 	},
 
 	statDefinitions: [{
@@ -1381,11 +1381,11 @@ var NummonTryInit = function() {
 	}
 };
 
-/* var box = function() {
+var box = function() {
 	if (this.game.resPool.get("elderBox").value == 0 && this.gamePage.resPool.get("wrappingPaper").value == 0) {
 		let time = new Date().getTime();
-		let time1 = new Date(2022, 0, 26).getTime();
-		let time2 = new Date(2022, 1, 7).getTime();
+		let time1 = new Date(2023, 0, 22).getTime();
+		let time2 = new Date(2023, 0, 29).getTime();
 		if (time >= time1 && time < time2) {
 			$.ajax({
 				cache: false,
@@ -1410,90 +1410,5 @@ var NummonTryInit = function() {
 	}
 };
 
-var spring = function() {
-	var haveMsg;
-	var springFestival = new Date(2022, 1, 1).getTime();
-	var now = new Date().getTime();
-	var totalTime = springFestival + 600000 - now;
-	if (totalTime > -600000) {
-		var e = setInterval(function() {
-			let now = new Date().getTime();
-			let springFestival = new Date(2022, 1, 1).getTime();
-			let totalTime = springFestival - now;
-			if (totalTime > 0) {
-				now = new Date().getTime();
-				totalTime = springFestival - now;
-			} else if (totalTime > -600000 && totalTime <= 0) {
-				if (!haveMsg) {
-					game.msg("Cheney祝你新年快乐", "important");
-					haveMsg = true;
-					clearInterval(e);
-				}
-			}
-		}, 1000);
-	}
-};
-
-var dailySign = function() {
-	var a = localStorage['sign'] || 0;
-	var currentYear = new Date().getFullYear().toString();
-	var hasTimestamp = new Date() - new Date(currentYear);
-	var hasDays = Math.ceil(hasTimestamp / 86400000);
-	if (hasDays > a && hasDays <= 38 && a <= 38) {
-		$.ajax({
-			cache: false,
-			type: "GET",
-			dataType: "JSON",
-			crossDomain: true,
-			url: "https://worldtimeapi.org/api/ip/"
-		}).done(function(resp) {
-			if (resp) {
-				var day = resp.day_of_year;
-				var b = Math.floor(Math.random() * 3);
-				if (b === 0) {
-					var shipValue = game.resPool.get("ship").value;
-					if (!shipValue) {
-						return;
-					}
-					do {
-						b++;
-					}
-					while (Math.floor(Math.random() * 2))
-					var c = Math.max(game.resPool.get("ship").value * 0.01, 1);
-					game.resPool.addResEvent("ship", b);
-					game.msg("除旧迎新，Cheney送上" + game.getDisplayValueExt(b * c) + " 个贸易船", "important");
-				} else if (b === 1) {
-					var shipValue = game.resPool.get("starchart").value;
-					if (!shipValue) {
-						return;
-					}
-					do {
-						b++;
-					}
-					while (Math.floor(Math.random() * 2))
-					var c = Math.max(game.resPool.get("starchart").value * 0.01, 1);
-					game.resPool.addResEvent("starchart", b);
-					game.msg("除旧迎新，Cheney送上" + game.getDisplayValueExt(b * c) + " 星图", "important");
-				} else if (b === 2) {
-					var shipValue = game.resPool.get("unobtainium").value;
-					if (!shipValue) {
-						return;
-					}
-					do {
-						b++;
-					}
-					while (Math.floor(Math.random() * 2))
-					var c = Math.max(game.resPool.get("unobtainium").perTickCached, 1);
-					game.resPool.addResEvent("unobtainium", b * c);
-					game.msg("除旧迎新，Cheney送上" + game.getDisplayValueExt(b * c) + " 难得素", "important");
-				}
-				localStorage['sign'] = resp.day_of_year;
-			}
-		});
-	}
-};*/
-
 NummonTryInit();
-//box();
-//spring();
-//dailySign();
+box();
