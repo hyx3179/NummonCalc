@@ -1171,14 +1171,6 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 			// title: "Science"
 		},
 		{
-			name: "titanium",
-			// title: "Titanium"
-		},
-		{
-			name: "pollution",
-			// title: "Pollution"
-		},
-		{
 			name: "unicorns",
 			// title: "Unicorns""
 		},
@@ -1205,7 +1197,15 @@ dojo.declare("classes.managers.NummonStatsManager", com.nuclearunicorn.core.TabM
 		{
 			name: "others",
 			// title: "Others"
-		}
+		},
+		{
+			name: "pollution",
+			// title: "Pollution"
+		},
+		{
+			name: "titanium",
+			// title: "Titanium"
+		},
 	],
 
 	statGroups: null,
@@ -1381,34 +1381,34 @@ var NummonTryInit = function() {
 	}
 };
 
-var box = function() {
-	if (this.game.resPool.get("elderBox").value == 0 && this.gamePage.resPool.get("wrappingPaper").value == 0) {
-		let time = new Date().getTime();
-		let time1 = new Date(2023, 0, 22).getTime();
-		let time2 = new Date(2023, 0, 29).getTime();
-		if (time >= time1 && time < time2) {
-			$.ajax({
-				cache: false,
-				type: "GET",
-				dataType: "JSON",
-				crossDomain: true,
-				url: "https://worldtimeapi.org/api/ip/"
-			}).done(function(resp) {
-				if (resp) {
-					var day = resp.day_of_year;
-					if (day >= 26 && day <= 38) {
-						game.resPool.get("elderBox").value++;
-						game.msg("新年快乐，Cheney送了你一份礼物盒", "important");
-						if (!game.karmaKittens) {
-							game.karmaKittens += 5;
-							game.msg("新年快乐，Cheney送了你一份业", "important");
-						}
-					}
-				}
-			});
-		}
-	}
-};
+// var box = function() {
+// 	if (this.game.resPool.get("elderBox").value == 0 && this.gamePage.resPool.get("wrappingPaper").value == 0) {
+// 		let time = new Date().getTime();
+// 		let time1 = new Date(2023, 0, 22).getTime();
+// 		let time2 = new Date(2023, 0, 29).getTime();
+// 		if (time >= time1 && time < time2) {
+// 			$.ajax({
+// 				cache: false,
+// 				type: "GET",
+// 				dataType: "JSON",
+// 				crossDomain: true,
+// 				url: "https://worldtimeapi.org/api/ip/"
+// 			}).done(function(resp) {
+// 				if (resp) {
+// 					var day = resp.day_of_year;
+// 					if (day >= 26 && day <= 38) {
+// 						game.resPool.get("elderBox").value++;
+// 						game.msg("新年快乐，Cheney送了你一份礼物盒", "important");
+// 						if (!game.karmaKittens) {
+// 							game.karmaKittens += 5;
+// 							game.msg("新年快乐，Cheney送了你一份业", "important");
+// 						}
+// 					}
+// 				}
+// 			});
+// 		}
+// 	}
+// };
 
 NummonTryInit();
-box();
+//box();
