@@ -16,22 +16,16 @@ jobs:
 
       - name: Build
         run: |
-          wget -q https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v20220405/closure-compiler-v20220405.jar -O ./compiler.jar
+          npm i -g google-closure-compiler
           mkdir ./public
-          java -jar compiler.jar --js NummonCalc.js --js_output_file ./public/NummonCalc.js
-          cp -r ./public ./public_Netlify
-          echo -e '/*\n  Access-Control-Allow-Origin: *' > ./public_Netlify/_headers
+          google-closure-compiler --js ./NummonCalc.js --js_output_file ./public/NummonCalc.js
 
-      - name: Deploy GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@main
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-
-      - name: Deploy Netlify
-        env:
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        run: |
-          npm install netlify-cli -g
-          netlify deploy --dir=public_Netlify --prod
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-rlgoDzvc -i --delete"
+          SOURCE: "public/"
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.REMOTE_TARGET }}
