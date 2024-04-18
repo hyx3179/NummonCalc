@@ -1398,4 +1398,15 @@ var box = function() {
 };
 
 NummonTryInit();
-box();
+
+var boxInit = function() {
+	if (typeof gamePage === "undefined") {
+		setTimeout(function() {
+			boxInit();
+		}, 2000);
+	} else {
+		box();
+	}
+};
+
+boxInit();
